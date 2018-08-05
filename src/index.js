@@ -122,6 +122,14 @@ class Game extends React.Component {
     }
 }
 
+class SamplePassData extends React.Component{
+    render(){
+        return(
+            <button onClick={this.props.triggerEventSample}>CLICK</button>
+        );
+    }
+}
+
 class SearchBar extends React.Component{
     constructor(props){
         super(props);
@@ -138,11 +146,27 @@ class SearchBar extends React.Component{
         });
     }
 
+    handleSubmit(e){
+        e.preventDefault();
+        // Passing the value to the parent
+        this.props.searchValue(this.state.value);
+    }
+
+    handleSubmit2(e){
+        e.preventDefault();
+        // Passing the function to the parent
+        alert('The React function is controlled from the child Component to its Parent Component');
+    }
+
     render(){
         return (
             <div className="searchbar">
+            <form onSubmit={this.handleSubmit.bind(this)}>
                 <label htmlFor="search">Search: </label>
                 <input name="search" value={this.state.value} onChange={this.handleChange} placeholder="Enter product..."/>
+                <input type="submit" name="submit"/>
+                <SamplePassData triggerEventSample={this.handleSubmit2.bind(this)}/>
+            </form>
             </div>
         );
     }
@@ -179,8 +203,6 @@ function TableRow(props){
             num += 1;
         });
    }
-
-    console.log(data);
 
     return(data);
 }
@@ -225,11 +247,15 @@ class FilterableProductTable extends React.Component{
             <div className="product">
                 <br/>
                 <h1>Product List Activity</h1>
-               <SearchBar/>
+               <SearchBar searchValue={this.handleSearchValue.bind(this)}/>
                <br/>
                <ProductTable  head={productHead} body={productList}/>
             </div>
         );
+    }
+
+    handleSearchValue(v){
+        alert("The React data was passed through a Child to Parent Component.\nData: "+v);
     }
 }
 
