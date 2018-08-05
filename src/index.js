@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+var _ = require('lodash');
 
 function Square(props){
     return (
@@ -121,10 +122,132 @@ class Game extends React.Component {
     }
 }
 
+class SearchBar extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.handleChange = this.handleChange.bind(this);
+        this.state = {
+            value: ''
+        };
+    }
+
+    handleChange(e){
+        this.setState({
+            value: e.target.value,
+        });
+    }
+
+    render(){
+        return (
+            <div className="searchbar">
+                <label htmlFor="search">Search: </label>
+                <input name="search" value={this.state.value} onChange={this.handleChange} placeholder="Enter product..."/>
+            </div>
+        );
+    }
+}
+
+function TableRow(props){
+    const data = [];
+
+    const arrangedData = _.groupBy(props.body, function(v){
+        return v.category;
+    });
+
+    var num = 0;
+    for(const key in arrangedData){
+        arrangedData[key].map((v, i) => {
+            let color = null;
+            if(i === 0){
+                data.push(
+                    <tr key={key}>
+                        <th colSpan="2">{key}</th>
+                    </tr>
+                );
+            }
+                if(!v.stocked){
+                    color = "red";
+                }
+    
+                data.push(
+                    <tr key={num}>
+                        <td style={{color: color}}>{v.name}</td>
+                        <td>{v.price}</td>
+                    </tr>
+                );
+            num += 1;
+        });
+   }
+
+    console.log(data);
+
+    return(data);
+}
+
+class ProductTable extends React.Component {
+    render(){
+        const thead = this.props.head.map((v) => {
+            return (
+                <th key={v}>{v}</th>
+            );
+        });
+
+        return(
+            <table>
+                <thead>
+                    <tr>
+                       {thead}
+                    </tr>
+                </thead>
+                <tbody>
+                    <TableRow body={this.props.body}/>
+                </tbody>
+            </table>       
+        );
+    }
+}
+
+class FilterableProductTable extends React.Component{
+    render(){
+        let productHead = ['Name', 'Price'];
+
+        let productList = [
+            {category: "Sporting Goods", price: "$49.99", stocked: true, name: "Football"},
+            {category: "Electronics", price: "$399.99", stocked: false, name: "iPhone 5"},
+            {category: "Sporting Goods", price: "$9.99", stocked: true, name: "Baseball"},
+            {category: "Electronics", price: "$99.99", stocked: true, name: "iPod Touch"},
+            {category: "Sporting Goods", price: "$29.99", stocked: false, name: "Basketball"},
+            {category: "Electronics", price: "$199.99", stocked: true, name: "Nexus 7"}
+        ];
+
+        return(
+            <div className="product">
+                <br/>
+                <h1>Product List Activity</h1>
+               <SearchBar/>
+               <br/>
+               <ProductTable  head={productHead} body={productList}/>
+            </div>
+        );
+    }
+}
+
+class App extends React.Component{
+    render() {
+        return (
+            <div>
+                <Game />
+                <FilterableProductTable/>
+            </div>
+        );
+    }
+}
+
   // ========================================
   
 ReactDOM.render(
-    <Game />,
+    <App />,
     document.getElementById('root')
 ); 
 
